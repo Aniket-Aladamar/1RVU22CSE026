@@ -1,13 +1,13 @@
 const axios = require('axios');
 require('dotenv').config();
 
-const LOG_API_URL = process.env.LOG_API_URL;
-const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
+const LOG_API_URL = process.env.LOG_API_URL || null;
+const ACCESS_TOKEN = process.env.ACCESS_TOKEN || null;
 
 const validStacks = ["backend", "frontend"];
 const validLevels = ["debug", "info", "warn", "error", "fatal"];
 const validPackages = [
-  "cache", "controller", "cron_job", "db", "domain", "handler", 
+  "cache", "controller", "cron_job", "db", "domain", "handler",
   "repository","route","service"
 ];
 
@@ -22,7 +22,7 @@ async function Log(stack, level, pkg, message) {
     const response = await axios.post(LOG_API_URL, payload, {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${ACCESS_TOKEN}`
+        "Authorization": ACCESS_TOKEN ? `Bearer ${ACCESS_TOKEN}` : undefined
       }
     });
 
@@ -39,8 +39,11 @@ async function Log(stack, level, pkg, message) {
   }
 }
 
-// test cases
-(async () => {
-  await Log("backend", "error", "handler", "received string, expected bool");
-  await Log("backend", "fatal", "db", "Critical database connection failure.");
-})();
+if (require.main === module) {
+  (async () => {
+    await Log("backend", "error", "handler", "received string, expected bool");
+    await Log("backend", "fatal", "db", "Critical database connection failure.");
+  })();
+}
+
+module.exports = { Log };

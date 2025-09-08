@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shortener Stats</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Stats</h1>
+    <div style="text-align:right;margin-bottom:6px;"><a href="index.html">Create</a></div>
+    <div id="stats" class="result"></div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // render stats from localStorage
+    function renderStats() {
+      const store = JSON.parse(localStorage.getItem('short_urls') || '{}');
+  const statsDiv = document.getElementById('stats');
+  statsDiv.innerHTML = '';
+      const keys = Object.keys(store);
+      if (!keys.length) {
+        statsDiv.innerHTML += '<p>No URLs created yet.</p>';
+        return;
+      }
+      keys.forEach(k => {
+        const item = store[k];
+        const clicks = item.clicks || [];
+        statsDiv.innerHTML += `<div class="link"><strong>${k}</strong> → <a href="${item.longUrl}" target="_blank">${item.longUrl}</a> · ${clicks.length} clicks
+          <div style="font-size:12px;margin-top:6px;">${clicks.map(c=>`[${new Date(c.ts).toLocaleString()}] ${c.source||'unknown'}`).join('<br>')}</div>
+        </div>`;
+      });
+    }
+
+    renderStats();
+  </script>
+</body>
+</html>
